@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Manager</title>
+  <link rel="stylesheet" href="index.css">
+  <style>
+    
+  </style>
+</head>
+<body>
+    <center>
+        <h2>Student Manager</h2>
+        <p>Total Students: <span id="studentCount">0</span></p>
+    </center>
+
+  <div>
+    <label>Name: </label>
+    <input type="text" id="name" placeholder="Enter name"><br>
+    <label>Mobile: </label>
+    <input type="tel" id="mobile" placeholder="Enter mobile"><br>
+    <label>Address: </label>
+    <input type="text" id="address" placeholder="Enter address"><br>
+    <button onclick="addOrUpdateStudent()">Add</button>
+  </div>
+
+  <h3>All students</h3>
+  <ul id="studentList"></ul>
+
+  <script>
+    let studentCount = 0;
+    let editIndex = -1;  // Track the index of student being edited
+    let students = [];   // Store students in an array
+
+    function addOrUpdateStudent() {
+      const name = document.getElementById("name").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const address = document.getElementById("address").value.trim();
+
+      if (name === "" || mobile === "" || address === "") {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      if (editIndex === -1) {
+        // Add new student
+        students.push({ name, mobile, address });
+        studentCount++;
+      } else {
+        // Update existing student
+        students[editIndex] = { name, mobile, address };
+        editIndex = -1;
+      }
+
+      renderStudents();
+      clearInputs();
+    }
+
+    function renderStudents() {
+      const list = document.getElementById("studentList");
+      list.innerHTML = "";
+
+      students.forEach((student, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${student.name} - ${student.mobile} - ${student.address}
+          <button class="btn" onclick="editStudent(${index})">Edit</button>
+          <button class="btn" onclick="deleteStudent(${index})">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+
+      document.getElementById("studentCount").innerText = students.length;
+    }
+
+    function deleteStudent(index) {
+      students.splice(index, 1);
+      studentCount--;
+      renderStudents();
+    }
+
+    function editStudent(index) {
+      const student = students[index];
+      document.getElementById("name").value = student.name;
+      document.getElementById("mobile").value = student.mobile;
+      document.getElementById("address").value = student.address;
+      editIndex = index;
+    }
+
+    function clearInputs() {
+      document.getElementById("name").value = "";
+      document.getElementById("mobile").value = "";
+      document.getElementById("address").value = "";
+    }
+  </script>
+</body>
+</html>
