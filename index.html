@@ -30,8 +30,8 @@
 
   <script>
     let studentCount = 0;
-    let editIndex = -1;  // Track the index of student being edited
-    let students = [];   // Store students in an array
+    let editIndex = -1;  
+    let students = [];
 
     function addOrUpdateStudent() {
       const name = document.getElementById("name").value.trim();
@@ -39,16 +39,15 @@
       const address = document.getElementById("address").value.trim();
 
       if (name === "" || mobile === "" || address === "") {
-        alert("Please fill all fields!");
+        alert("Please fill all required fields!");
         return;
       }
 
       if (editIndex === -1) {
-        // Add new student
+
         students.push({ name, mobile, address });
         studentCount++;
       } else {
-        // Update existing student
         students[editIndex] = { name, mobile, address };
         editIndex = -1;
       }
@@ -59,7 +58,7 @@
 
     function renderStudents() {
       const list = document.getElementById("studentList");
-      list.innerHTML = "";
+      list.innerHTML = "";//it will clear old list before rerendering
 
       students.forEach((student, index) => {
         const li = document.createElement("li");
@@ -71,8 +70,8 @@
         list.appendChild(li);
       });
 
-      document.getElementById("studentCount").innerText = students.length;
-    }
+      document.getElementById("studentCount").innerText = students.length;//replaces the text inside that element with current no.of students
+    } //in the students array:
 
     function deleteStudent(index) {
       students.splice(index, 1);

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Manager</title>
+  <link rel="stylesheet" href="first.css">
+</head>
+<body>
+    <center>
+        <h2>Student Manager</h2>
+        <p>Total Students: <span id="studentCount">0</span></p>
+    </center>
+
+  <div>
+    <label><b>Name:</b></label>
+    <input type="text" id="name" placeholder="Enter name"><br>
+    <label><b>Mobile:</b></label>
+    <input type="text" id="mobile" placeholder="Enter mobile"><br>
+    <label><b>Address:</b></label>
+    <input type="text" id="address" placeholder="Enter address"><br>
+    <button onclick="addOrUpdateStudent()">Add</button>
+  </div>
+
+  <h3>All Students</h3>
+  <ul id="studentList"></ul>
+
+  <script>
+    const API_URL = "https://crudcrud.com/api/1e717d2791df42a493a8fe19270ec68e/students"; 
+    let studentCount = 0;
+    let editId = null;  // stores ID when editing
+
+    
+    window.onload = () => fetchStudents();// Fetch students when page loads
+
+    async function addOrUpdateStudent() {
+      const name = document.getElementById("name").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const address = document.getElementById("address").value.trim();
+
+      if (!name || !mobile || !address) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      const student = { name, mobile, address };
+
+      if (editId) {
+        await fetch(`${API_URL}/${editId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(student)
+        });
+        editId = null;
+      } else {
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(student)
+        });
+      }
+
+
+      fetchStudents();
+
+      document.getElementById("name").value = "";
+      document.getElementById("mobile").value = "";
+      document.getElementById("address").value = "";
+      document.querySelector("button").innerText = "Add"; // reset button text
+    }
+
+    async function fetchStudents() {
+      const res = await fetch(API_URL);
+      const students = await res.json();
+
+      const list = document.getElementById("studentList");
+      list.innerHTML = "";
+      studentCount = students.length;
+      document.getElementById("studentCount").innerText = studentCount;
+
+      students.forEach(student => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${student.name} - ${student.mobile} - ${student.address}
+          <button onclick="editStudent('${student._id}', '${student.name}', '${student.mobile}', '${student.address}')">Edit</button>
+          <button onclick="deleteStudent('${student._id}')">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function deleteStudent(id) {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      fetchStudents();
+    }
+
+    function editStudent(id, name, mobile, address) {
+      document.getElementById("name").value = name;
+      document.getElementById("mobile").value = mobile;
+      document.getElementById("address").value = address;
+      document.querySelector("button").innerText = "Update";
+      editId = id;// without this when the user clicks update your code wouldnt know which student in the DB needs to be modified 
+    }
+  </script>
+</body>
+</html>
